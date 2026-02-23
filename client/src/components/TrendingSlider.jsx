@@ -150,7 +150,6 @@ const TrendingSlider = () => {
 
       {/* Slides */}
       <div ref={sliderRef} className="h-full">
-        {/* Render a single active slide from the pool to create a smooth rotating experience */}
         {moviesPool.map((movie, index) => {
           const isActive = index === currentIndex;
           return (
@@ -180,7 +179,29 @@ const TrendingSlider = () => {
 
                     <p className="mb-4 text-sm text-gray-300 line-clamp-2 md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
 
-                    <div className="mt-4 flex flex-wrap gap-3">
+                    {/* Buttons - only visible on mobile, stacked, no cutting */}
+                    <div className="mt-4 flex flex-col gap-3 sm:hidden">
+                      <Link
+                        to={`/movie/${movie.id}#watch`}
+                        className="flex items-center justify-center rounded-full bg-secondary px-6 py-3 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90 shadow-md"
+                      >
+                        <FaInfo className="mr-2 text-xl" />
+                        View Details
+                      </Link>
+
+                      <a
+                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center rounded-full bg-white/20 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30 shadow-md"
+                      >
+                        <FaPlay className="mr-2 text-xl" />
+                        Watch Trailer
+                      </a>
+                    </div>
+
+                    {/* Desktop buttons (original) */}
+                    <div className="mt-4 hidden sm:flex flex-wrap gap-3">
                       <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-6 py-2 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
                         <FaInfo className="mr-2" />
                         View Details
@@ -199,8 +220,8 @@ const TrendingSlider = () => {
         })}
       </div>
 
-      {/* Dots indicator */}
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 space-x-2">
+      {/* Dots indicator - only on desktop */}
+      <div className="hidden md:flex absolute bottom-4 left-1/2 z-10 -translate-x-1/2 space-x-2">
         {moviesPool.map((_, index) => (
           <button
             key={index}
