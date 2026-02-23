@@ -165,6 +165,7 @@ const TrendingSlider = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
+                {/* Only added pb-16 sm:pb-20 md:pb-20 lg:pb-24 here — extra bottom space to lift buttons */}
                 <div className="absolute bottom-0 left-0 w-full p-6 pb-16 sm:pb-20 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
                   <div className="animate-fadeSlideUp">
                     <div className="mb-2 flex items-center gap-3">
