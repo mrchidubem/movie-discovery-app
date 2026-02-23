@@ -134,7 +134,7 @@ const TrendingSlider = () => {
       {/* Slider navigation buttons */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100 hidden md:flex"
         aria-label="Previous"
       >
         <FaChevronLeft size={24} />
@@ -142,7 +142,7 @@ const TrendingSlider = () => {
       
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100 hidden md:flex"
         aria-label="Next"
       >
         <FaChevronRight size={24} />
@@ -179,14 +179,23 @@ const TrendingSlider = () => {
 
                     <p className="mb-4 text-sm text-gray-300 line-clamp-2 md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
 
-                    <div className="mt-4 flex flex-wrap gap-3">
-                      <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-6 py-2 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
-                        <FaInfo className="mr-2" />
+                    {/* Buttons - responsive, stacked on mobile, no cutting */}
+                    <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-[90%] sm:max-w-none">
+                      <Link 
+                        to={`/movie/${movie.id}#watch`} 
+                        className="flex items-center justify-center rounded-full bg-secondary px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90 sm:px-6 sm:py-3"
+                      >
+                        <FaInfo className="mr-2 text-base sm:text-lg" />
                         View Details
                       </Link>
 
-                      <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`} target="_blank" rel="noopener noreferrer" className="flex items-center rounded-full bg-white/20 px-6 py-2 font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30">
-                        <FaPlay className="mr-2" />
+                      <a 
+                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center justify-center rounded-full bg-white/20 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30 sm:px-6 sm:py-3"
+                      >
+                        <FaPlay className="mr-2 text-base sm:text-lg" />
                         Watch Trailer
                       </a>
                     </div>
