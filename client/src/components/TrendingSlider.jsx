@@ -237,4 +237,4 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-export default TrendingSlid
+export default TrendingSlider;
