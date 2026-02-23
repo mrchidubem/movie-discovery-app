@@ -120,10 +120,10 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen px-2 pb-10 pt-20 sm:px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen px-2 pb-10 pt-14 sm:pt-20 md:pt-24 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Hero Slider */}
-        <section className="mb-12">
+        <section className="mb-8 sm:mb-12">
           <TrendingSlider />
         </section>
 
@@ -168,20 +168,20 @@ const Home = () => {
           {loading ? (
             <Loader size="large" />
           ) : (
-          <MovieGrid
-            movies={trendingMovies}
-            title="Trending Movies"
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            favorites={favorites}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-        )}
-      </section>
+            <MovieGrid
+              movies={trendingMovies}
+              title="Trending Movies"
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          )}
+        </section>
       </div>
     </div>
   );
 };
 
-export default Home; 
+export default Home;
