@@ -165,7 +165,7 @@ const TrendingSlider = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 md:bottom-10 md:p-10 lg:w-2/3">
+                <div className="absolute bottom-0 left-0 w-full p-6 pb-16 sm:pb-20 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
                   <div className="animate-fadeSlideUp">
                     <div className="mb-2 flex items-center gap-3">
                       <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium text-white">Trending</span>
@@ -179,29 +179,7 @@ const TrendingSlider = () => {
 
                     <p className="mb-4 text-sm text-gray-300 line-clamp-2 md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
 
-                    {/* Buttons - smaller & visible on mobile only, stacked, no cutting */}
-                    <div className="mt-4 flex flex-col gap-3 sm:hidden">
-                      <Link
-                        to={`/movie/${movie.id}#watch`}
-                        className="flex items-center justify-center rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90 shadow-md"
-                      >
-                        <FaInfo className="mr-1.5 text-base" />
-                        View Details
-                      </Link>
-
-                      <a
-                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30 shadow-md"
-                      >
-                        <FaPlay className="mr-1.5 text-base" />
-                        Watch Trailer
-                      </a>
-                    </div>
-
-                    {/* Desktop buttons (original size) */}
-                    <div className="mt-4 hidden sm:flex flex-wrap gap-3">
+                    <div className="mt-4 flex flex-wrap gap-3">
                       <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-6 py-2 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
                         <FaInfo className="mr-2" />
                         View Details
@@ -259,4 +237,4 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-export default TrendingSlider;
+export default TrendingSlid
