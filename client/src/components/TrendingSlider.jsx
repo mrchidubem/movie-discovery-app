@@ -179,13 +179,13 @@ const TrendingSlider = () => {
 
                     <p className="mb-4 text-sm text-gray-300 line-clamp-2 md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
 
-                    {/* Buttons - only visible on mobile, stacked, no cutting */}
+                    {/* Buttons - smaller & visible on mobile only, stacked, no cutting */}
                     <div className="mt-4 flex flex-col gap-3 sm:hidden">
                       <Link
                         to={`/movie/${movie.id}#watch`}
-                        className="flex items-center justify-center rounded-full bg-secondary px-6 py-3 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90 shadow-md"
+                        className="flex items-center justify-center rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90 shadow-md"
                       >
-                        <FaInfo className="mr-2 text-xl" />
+                        <FaInfo className="mr-1.5 text-base" />
                         View Details
                       </Link>
 
@@ -193,14 +193,14 @@ const TrendingSlider = () => {
                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center rounded-full bg-white/20 px-6 py-3 font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30 shadow-md"
+                        className="flex items-center justify-center rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30 shadow-md"
                       >
-                        <FaPlay className="mr-2 text-xl" />
+                        <FaPlay className="mr-1.5 text-base" />
                         Watch Trailer
                       </a>
                     </div>
 
-                    {/* Desktop buttons (original) */}
+                    {/* Desktop buttons (original size) */}
                     <div className="mt-4 hidden sm:flex flex-wrap gap-3">
                       <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-6 py-2 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
                         <FaInfo className="mr-2" />
@@ -220,8 +220,8 @@ const TrendingSlider = () => {
         })}
       </div>
 
-      {/* Dots indicator - only on desktop */}
-      <div className="hidden md:flex absolute bottom-4 left-1/2 z-10 -translate-x-1/2 space-x-2">
+      {/* Dots indicator */}
+      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 space-x-2">
         {moviesPool.map((_, index) => (
           <button
             key={index}
