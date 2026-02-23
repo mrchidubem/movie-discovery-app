@@ -59,15 +59,15 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   }
 
   return (
-    <div className="flex items-center justify-center space-x-1 py-8 md:space-x-2">
+    <div className="flex items-center justify-center flex-wrap gap-1 sm:gap-2 py-8">
       {/* Previous button */}
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`flex h-10 w-10 items-center justify-center rounded-full ${
+        className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-sm sm:text-base ${
           currentPage === 1
             ? 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
-            : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary'
+            : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary transition-colors'
         }`}
         aria-label="Previous page"
       >
@@ -80,12 +80,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           key={`page-${page}-${index}`}
           onClick={() => typeof page === 'number' && handlePageChange(page)}
           disabled={page === '...'}
-          className={`flex h-10 w-10 items-center justify-center rounded-full ${
+          className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-base ${
             page === currentPage
               ? 'bg-secondary font-semibold text-white'
               : page === '...'
               ? 'cursor-default bg-transparent'
-              : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary'
+              : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary transition-colors'
           }`}
           aria-label={page === '...' ? 'More pages' : `Page ${page}`}
           aria-current={page === currentPage ? 'page' : undefined}
@@ -98,10 +98,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`flex h-10 w-10 items-center justify-center rounded-full ${
+        className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-sm sm:text-base ${
           currentPage === totalPages
             ? 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
-            : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary'
+            : 'bg-gray-100 text-gray-700 hover:bg-secondary hover:text-white dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-secondary transition-colors'
         }`}
         aria-label="Next page"
       >

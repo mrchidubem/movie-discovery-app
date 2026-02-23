@@ -1,66 +1,43 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { showToast } from '../components/ToastContainer';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
 
-  // Mock auth API calls
-  const mockApiCall = async (data, success = true, delay = 800) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (success) {
-          resolve(data);
-        } else {
-          reject(new Error('API call failed'));
-        }
-      }, delay);
-    });
-  };
-
-  // Check if user is already logged in
+  // Restore session from localStorage on mount
   useEffect(() => {
-    const checkUserLoggedIn = async () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          // In a real app, validate the token with the server here
-          setUser(JSON.parse(storedUser));
-        } catch (error) {
-          localStorage.removeItem('user');
-        }
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (storedUser && storedUser !== 'undefined' && token) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error('Failed to parse stored user', err);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
-      setAuthChecked(true);
-    };
-
-    checkUserLoggedIn();
+    }
   }, []);
 
   const login = useCallback(async ({ email, password }) => {
     try {
       setLoading(true);
-      
-      // In a real app, make an API call to authenticate
-      const userData = await mockApiCall({
-        id: '1',
-        name: 'John Doe',
-        email,
-        avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=random`
-      });
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
+      const { data } = await api.post('/api/users/login', { email, password });
+
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+
       showToast('Logged in successfully!', 'success');
       return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      showToast('Login failed. Please check your credentials.', 'error');
+    } catch (err) {
+      const message = err?.response?.data?.message || err.message || 'Login failed';
+      showToast(message, 'error');
       return false;
     } finally {
       setLoading(false);
@@ -70,23 +47,17 @@ export const AuthProvider = ({ children }) => {
   const register = useCallback(async ({ name, email, password }) => {
     try {
       setLoading(true);
-      
-      // In a real app, make an API call to register
-      const userData = await mockApiCall({
-        id: Date.now().toString(),
-        name,
-        email,
-        avatar: `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=random`
-      });
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
+      const { data } = await api.post('/api/users/register', { name, email, password });
+
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+
       showToast('Account created successfully!', 'success');
       return true;
-    } catch (error) {
-      console.error('Registration error:', error);
-      showToast('Registration failed. Please try again.', 'error');
+    } catch (err) {
+      const message = err?.response?.data?.message || err.message || 'Registration failed';
+      showToast(message, 'error');
       return false;
     } finally {
       setLoading(false);
@@ -94,52 +65,35 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('user');
+    localStorage.clear();
     setUser(null);
-    showToast('Logged out successfully', 'info');
+    showToast('Logged out', 'info');
   }, []);
 
-  const updateProfile = useCallback(async (userData) => {
-    try {
-      setLoading(true);
-      
-      // In a real app, make an API call to update user data
-      const updatedUser = await mockApiCall({
-        ...user,
-        ...userData,
-        avatar: `https://ui-avatars.com/api/?name=${userData.name.replace(' ', '+')}&background=random`
-      });
-      
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      showToast('Profile updated successfully!', 'success');
-      return true;
-    } catch (error) {
-      console.error('Profile update error:', error);
-      showToast('Failed to update profile', 'error');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const value = {
-    user,
-    loading,
-    authChecked,
-    isAuthenticated: !!user,
-    login,
-    register,
-    logout,
-    updateProfile
-  };
+  // Update user data (for profile updates, etc.)
+  const updateUser = useCallback((updatedUserData) => {
+    setUser(prevUser => {
+      const newUser = { ...prevUser, ...updatedUserData };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
+  }, []);
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext; 
+export default AuthContext;

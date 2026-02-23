@@ -1,399 +1,287 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { FaMoon, FaSun, FaSearch, FaUser, FaSignOutAlt, FaBars, FaTimes, FaHeart, FaFilm } from 'react-icons/fa';
+import { FaMoon, FaSun, FaSearch, FaUser, FaSignOutAlt, FaBars, FaTimes, FaHeart, FaFilm, FaBell, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from './ToastContainer';
+import { searchMovies, getImageUrl } from '../services/tmdbApi';
 
 const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [featuresMenuOpen, setFeaturesMenuOpen] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
-  
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [suggestError, setSuggestError] = useState(null);
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  
   const userMenuRef = useRef(null);
-  const mobileMenuRef = useRef(null);
-  
-  // Handle click outside to close menus
+  const featuresMenuRef = useRef(null);
+  const searchDebounceRef = useRef(null);
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setUserMenuOpen(false);
-      }
-      
-      if (
-        mobileMenuRef.current && 
-        !mobileMenuRef.current.contains(event.target) && 
-        !event.target.closest('button[aria-label="Toggle mobile menu"]')
-      ) {
-        setIsOpen(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-  
-  // Handle navbar background change on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
-  const handleSubmit = (e) => {
+
+  // Live search suggestions (TMDB) with debounce
+  useEffect(() => {
+    if (!searchVisible) {
+      setSuggestions([]);
+      setSuggestError(null);
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      return;
+    }
+
+    const query = searchInput.trim();
+    if (query.length < 2) {
+      setSuggestions([]);
+      setSuggestError(null);
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      return;
+    }
+
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
+    searchDebounceRef.current = setTimeout(async () => {
+      try {
+        setSuggestLoading(true);
+        setSuggestError(null);
+        const data = await searchMovies(query, 1);
+        setSuggestions((data?.results || []).slice(0, 6));
+      } catch (e) {
+        console.error('Search suggestions failed', e);
+        setSuggestError('Unable to load suggestions');
+        setSuggestions([]);
+      } finally {
+        setSuggestLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchInput, searchVisible]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+      if (featuresMenuRef.current && !featuresMenuRef.current.contains(e.target)) setFeaturesMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    logout();
+    setUserMenuOpen(false);
+    showToast('Logged out successfully', 'success');
+    navigate('/');
+  };
+
+  const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchInput.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`);
       setSearchInput('');
       setSearchVisible(false);
+      setSuggestions([]);
+      setSuggestError(null);
     }
   };
-  
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setUserMenuOpen(false);
-      showToast('success', 'Logged out successfully');
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed', error);
-      showToast('error', 'Logout failed. Please try again.');
-    }
+
+  const handleSuggestionClick = (movieId) => {
+    navigate(`/movie/${movieId}#watch`);
+    setSearchVisible(false);
+    setSearchInput('');
+    setSuggestions([]);
+    setSuggestError(null);
   };
-  
-  const toggleMobileMenu = () => setIsOpen(!isOpen);
-  const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
-  const toggleSearchBar = () => setSearchVisible(!searchVisible);
-  
+
   return (
-    <nav className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-white shadow-md dark:bg-gray-800' : 'bg-transparent'}`}>
-      <div className="container mx-auto px-4">
-        <div className="relative flex h-16 items-center justify-between md:h-20">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link
-              to="/"
-              className="flex items-center text-2xl font-bold text-secondary"
-            >
-              <FaFilm className="mr-2" />
-              <span className="hidden sm:inline">MovieVerse</span>
-            </Link>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
-              <div className="hidden md:block">
-                <div className="flex space-x-1">
-                  <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                      `px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                        isActive
-                          ? 'text-secondary'
-                          : 'text-gray-800 hover:text-secondary dark:text-gray-200'
-                      }`
-                    }
-                  >
-                    Home
-                  </NavLink>
-                  
-                  <NavLink
-                    to="/search"
-                    className={({ isActive }) =>
-                      `px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                        isActive
-                          ? 'text-secondary'
-                          : 'text-gray-800 hover:text-secondary dark:text-gray-200'
-                      }`
-                    }
-                  >
-                    Discover
-                  </NavLink>
-                  
-                  {user && (
-                    <NavLink
-                      to="/favorites"
-                      className={({ isActive }) =>
-                        `px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                          isActive
-                            ? 'text-secondary'
-                            : 'text-gray-800 hover:text-secondary dark:text-gray-200'
-                        }`
-                      }
-                    >
-                      Favorites
-                    </NavLink>
-                  )}
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-sm bg-white/80 shadow-md dark:bg-gray-900/75' : 'bg-transparent'}`}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative flex h-16 md:h-20 items-center justify-between">
+          <Link to="/" className="flex items-center text-2xl font-bold text-secondary hover:scale-105 transition-transform">
+            <div className="flex items-center justify-center h-10 w-10 mr-2 rounded-full bg-gradient-to-br from-secondary to-indigo-500 text-white shadow-md">
+              <FaFilm />
+            </div>
+            <span className="hidden sm:inline tracking-tight text-lg">MovieVerse</span>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center space-x-3">
+            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>Home</NavLink>
+            <NavLink to="/search" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>Discover</NavLink>
+            {user && <NavLink to="/favorites" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>❤️ Favorites</NavLink>}
+            {user && <NavLink to="/watchlist" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>⏰ Watchlist</NavLink>}
+            
+            {/* Features Dropdown */}
+            <div className="relative" ref={featuresMenuRef}>
+              <button
+                onClick={() => setFeaturesMenuOpen(prev => !prev)}
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-800 hover:text-secondary dark:text-gray-200 flex items-center gap-1"
+              >
+                ✨ More <FaChevronDown size={12} className={`transition-transform ${featuresMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {featuresMenuOpen && (
+                <div className="absolute left-0 mt-2 w-56 rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl ring-1 ring-black ring-opacity-5 z-10">
+                  <NavLink to="/search/advanced" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
+                  <NavLink to="/collections" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Curated Collections</NavLink>
+                  <NavLink to="/streaming-calendar" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Streaming Calendar</NavLink>
+                  <NavLink to="/pricing" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm border-t ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}`}>💳 Upgrade Plan</NavLink>
                 </div>
-              </div>
+              )}
             </div>
           </div>
-          
-          {/* Desktop & Mobile Right Section */}
-          <div className="flex items-center">
-            {/* Search toggle */}
-            <button
-              onClick={toggleSearchBar}
-              className="rounded-full p-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-              aria-label="Toggle search"
-            >
-              <FaSearch />
-            </button>
-            
-            {/* Theme toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="ml-2 rounded-full p-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-              aria-label={`Toggle ${isDarkMode ? 'light' : 'dark'} mode`}
-            >
-              {isDarkMode ? <FaSun /> : <FaMoon />}
-            </button>
-            
-            {/* Authentication/User Menu */}
+
+          {/* Right section */}
+          <div className="flex items-center space-x-2">
+            <button onClick={() => setSearchVisible(prev => !prev)} className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><FaSearch /></button>
+            <button onClick={toggleDarkMode} className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700">{isDarkMode ? <FaSun /> : <FaMoon />}</button>
+
             {user ? (
-              <div className="relative ml-3">
-                <button
-                  onClick={toggleUserMenu}
-                  className="flex rounded-full text-sm focus:outline-none"
-                  aria-label="Toggle user menu"
-                >
-                  <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-gray-200 dark:border-gray-700">
-                    {user.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.name || 'User'}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-secondary text-white">
-                        {user.name 
-                          ? user.name[0].toUpperCase()
-                          : <FaUser />
-                        }
-                      </div>
-                    )}
+              <div className="relative">
+                <button onClick={() => setUserMenuOpen(prev => !prev)} className="flex rounded-full text-sm">
+                  <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-white flex items-center justify-center bg-gradient-to-br from-secondary to-pink-500 text-white shadow-lg">
+                    {user.name ? user.name[0].toUpperCase() : <FaUser />}
                   </div>
                 </button>
-                
+
                 {userMenuOpen && (
-                  <div
-                    ref={userMenuRef}
-                    className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700"
-                  >
-                    <div className="border-b border-gray-100 px-4 py-2 dark:border-gray-700">
-                      <p className="text-sm font-semibold">
-                        {user.name || 'User'}
-                      </p>
-                      <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                        {user.email}
-                      </p>
+                  <div ref={userMenuRef} className="absolute right-0 mt-2 w-56 rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl ring-1 ring-black ring-opacity-5">
+                    <div className="border-b px-4 py-2 dark:border-gray-700">
+                      <p className="text-sm font-semibold">{user.name || 'User'}</p>
+                      <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                     </div>
-                    
-                    <Link
-                      to="/profile"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      <FaUser className="mr-2" />
-                      Profile
-                    </Link>
-                    
-                    <Link
-                      to="/favorites"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      <FaHeart className="mr-2" />
-                      Favorites
-                    </Link>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
-                    >
-                      <FaSignOutAlt className="mr-2" />
-                      Sign out
-                    </button>
+                    <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">👤 Profile</Link>
+                    <Link to="/analytics" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">📊 Analytics</Link>
+                    <Link to="/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">❤️ Favorites</Link>
+                    <Link to="/watchlist" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">⏰ Watchlist</Link>
+                    <Link to="/collections" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">📂 Collections</Link>
+                    <Link to="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">⚙️ Settings</Link>
+                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">🚪 Sign out</button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="ml-3 hidden sm:block">
-                <button
-                  onClick={() => openAuthModal('login')}
-                  className="rounded-full border border-secondary bg-transparent px-4 py-1 text-sm font-medium text-secondary hover:bg-secondary/5"
-                >
-                  Log in
-                </button>
-                <button
-                  onClick={() => openAuthModal('signup')}
-                  className="ml-2 rounded-full bg-secondary px-4 py-1 text-sm font-medium text-white hover:bg-secondary/90"
-                >
-                  Sign up
-                </button>
+              <div className="hidden sm:flex space-x-2">
+                <button onClick={() => openAuthModal('login')} className="rounded-full border border-secondary px-4 py-1 text-sm font-medium text-secondary hover:bg-secondary/5">Log in</button>
+                <button onClick={() => openAuthModal('signup')} className="rounded-full bg-secondary px-4 py-1 text-sm font-medium text-white hover:bg-secondary/90">Sign up</button>
               </div>
             )}
-            
-            {/* Mobile menu button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="ml-2 inline-flex items-center justify-center rounded-md p-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 md:hidden"
-              aria-label="Toggle mobile menu"
-            >
-              {isOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+
+            <button onClick={() => setMobileOpen(prev => !prev)} className="ml-2 md:hidden rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+              {mobileOpen ? <FaTimes /> : <FaBars />}
             </button>
           </div>
         </div>
-        
+
+        {/* Mobile Menu */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <div className="px-4 py-3 space-y-2">
+              <NavLink to="/" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Home</NavLink>
+              <NavLink to="/search" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Discover</NavLink>
+              {user && <NavLink to="/favorites" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>❤️ Favorites</NavLink>}
+              {user && <NavLink to="/watchlist" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>⏰ Watchlist</NavLink>}
+              <hr className="my-2 dark:border-gray-700" />
+              <NavLink to="/search/advanced" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
+              <NavLink to="/collections" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Collections</NavLink>
+              <NavLink to="/streaming-calendar" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Calendar</NavLink>
+              <NavLink to="/pricing" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>💳 Upgrade</NavLink>
+            </div>
+          </div>
+        )}
+
         {/* Search Bar */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            searchVisible ? 'max-h-14 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <form onSubmit={handleSubmit} className="border-t border-gray-200 py-2 dark:border-gray-700">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <FaSearch className="text-gray-500" />
+        {searchVisible && (
+        <div className="border-t border-gray-200 py-3 px-4 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm">
+          <form onSubmit={handleSearch}>
+            <div className="relative flex gap-2">
+              <div className="relative flex-grow">
+                <FaSearch className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search for movies..."
+                  className="w-full rounded-lg border-0 bg-gray-100 py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 transition-all focus:outline-none focus:ring-2 focus:ring-secondary dark:bg-gray-700 dark:text-white"
+                  autoFocus
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchInput('')}
+                    className="absolute inset-y-0 right-3 flex items-center"
+                  >
+                    <FaTimes className="text-gray-500 hover:text-secondary" />
+                  </button>
+                )}
               </div>
-              <input
-                type="text"
-                placeholder="Search for movies..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full rounded-md border-0 bg-gray-100 py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-gray-700 dark:text-white"
-              />
-              {searchInput && (
-                <button
-                  type="button"
-                  onClick={() => setSearchInput('')}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
-                >
-                  <FaTimes className="text-gray-500" />
-                </button>
-              )}
+              <button
+                type="submit"
+                className="whitespace-nowrap rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-secondary/90"
+              >
+                Search
+              </button>
             </div>
           </form>
-        </div>
-      </div>
-      
-      {/* Mobile Navigation */}
-      <div
-        ref={mobileMenuRef}
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isOpen
-            ? 'max-h-64 border-t border-gray-200 dark:border-gray-700'
-            : 'max-h-0'
-        } overflow-hidden`}
-      >
-        <div className="space-y-1 px-2 pb-3 pt-2">
-          <NavLink
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className={({ isActive }) =>
-              `block rounded-md px-3 py-2 text-base font-medium ${
-                isActive
-                  ? 'bg-gray-100 text-secondary dark:bg-gray-800'
-                  : 'text-gray-900 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800'
-              }`
-            }
-          >
-            Home
-          </NavLink>
-          
-          <NavLink
-            to="/search"
-            onClick={() => setIsOpen(false)}
-            className={({ isActive }) =>
-              `block rounded-md px-3 py-2 text-base font-medium ${
-                isActive
-                  ? 'bg-gray-100 text-secondary dark:bg-gray-800'
-                  : 'text-gray-900 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800'
-              }`
-            }
-          >
-            Discover
-          </NavLink>
-          
-          {user ? (
-            <>
-              <NavLink
-                to="/favorites"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-base font-medium ${
-                    isActive
-                      ? 'bg-gray-100 text-secondary dark:bg-gray-800'
-                      : 'text-gray-900 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800'
-                  }`
-                }
-              >
-                Favorites
-              </NavLink>
-              
-              <NavLink
-                to="/profile"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-base font-medium ${
-                    isActive
-                      ? 'bg-gray-100 text-secondary dark:bg-gray-800'
-                      : 'text-gray-900 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800'
-                  }`
-                }
-              >
-                Profile
-              </NavLink>
-              
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsOpen(false);
-                }}
-                className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-red-600 hover:bg-gray-50 dark:text-red-400 dark:hover:bg-gray-800"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <div className="mt-3 flex flex-col space-y-2 px-3">
-              <button
-                onClick={() => {
-                  openAuthModal('login');
-                  setIsOpen(false);
-                }}
-                className="rounded-md bg-transparent border border-secondary px-4 py-2 text-center font-medium text-secondary"
-              >
-                Log in
-              </button>
-              
-              <button
-                onClick={() => {
-                  openAuthModal('signup');
-                  setIsOpen(false);
-                }}
-                className="rounded-md bg-secondary px-4 py-2 text-center font-medium text-white hover:bg-secondary/90"
-              >
-                Sign up
-              </button>
+
+          {/* Live suggestions */}
+          {(suggestions.length > 0 || suggestLoading || suggestError) && (
+            <div className="mt-3 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              {suggestLoading && (
+                <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
+                  Searching…
+                </div>
+              )}
+              {suggestError && !suggestLoading && (
+                <div className="px-4 py-3 text-sm text-red-500">{suggestError}</div>
+              )}
+              {!suggestLoading &&
+                !suggestError &&
+                suggestions.map((movie) => (
+                  <button
+                    key={movie.id}
+                    type="button"
+                    onClick={() => handleSuggestionClick(movie.id)}
+                    className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    {movie.poster_path ? (
+                      <img
+                        src={getImageUrl(movie.poster_path, 'w92')}
+                        alt={movie.title}
+                        className="h-12 w-8 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-8 items-center justify-center rounded bg-gray-300 text-xs text-gray-600">
+                        N/A
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
+                        {movie.title}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'} •{' '}
+                        {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}/10
+                      </p>
+                    </div>
+                  </button>
+                ))}
             </div>
           )}
         </div>
+        )}
       </div>
     </nav>
   );
 };
 
-export default Navbar; 
+export default Navbar;

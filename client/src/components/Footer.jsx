@@ -6,56 +6,32 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-gray-100 pt-12 dark:bg-gray-800">
+    <footer className="bg-gradient-to-t from-gray-50 to-white pt-12 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
         {/* Footer main content */}
         <div className="grid grid-cols-1 gap-8 pb-8 md:grid-cols-2 lg:grid-cols-4">
           {/* About section */}
           <div>
             <div className="mb-4 flex items-center">
-              <FaFilm className="mr-2 text-secondary" />
-              <h2 className="text-2xl font-bold text-secondary">MovieVerse</h2>
+              <div className="h-10 w-10 mr-2 rounded-full bg-gradient-to-br from-secondary to-indigo-500 text-white flex items-center justify-center shadow">
+                <FaFilm />
+              </div>
+              <h2 className="text-2xl font-bold">MovieVerse</h2>
             </div>
             <p className="mb-4 text-gray-600 dark:text-gray-300">
-              Discover the latest movies, create your watchlist, and share your thoughts with the MovieVerse community.
+              Discover the latest movies, craft your watchlist, and join a passionate community of movie lovers.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400"
-                aria-label="Twitter"
-              >
-                <FaTwitter size={20} />
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400"
-                aria-label="GitHub"
-              >
-                <FaGithub size={20} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400"
-                aria-label="LinkedIn"
-              >
-                <FaLinkedin size={20} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400"
-                aria-label="Instagram"
-              >
-                <FaInstagram size={20} />
-              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400" aria-label="Twitter"><FaTwitter size={20} /></a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400" aria-label="GitHub"><FaGithub size={20} /></a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400" aria-label="LinkedIn"><FaLinkedin size={20} /></a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-secondary dark:text-gray-400" aria-label="Instagram"><FaInstagram size={20} /></a>
+            </div>
+            <div className="mt-6">
+              <form className="flex max-w-sm items-center gap-2">
+                <input type="email" placeholder="Your email" className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                <button className="rounded-lg bg-secondary px-3 py-2 text-sm text-white">Join</button>
+              </form>
             </div>
           </div>
           
@@ -85,6 +61,22 @@ const Footer = () => {
                   className="text-gray-600 transition-colors hover:text-secondary dark:text-gray-300 dark:hover:text-secondary"
                 >
                   Favorites
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/watchlist"
+                  className="text-gray-600 transition-colors hover:text-secondary dark:text-gray-300 dark:hover:text-secondary"
+                >
+                  Watchlist
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collections"
+                  className="text-gray-600 transition-colors hover:text-secondary dark:text-gray-300 dark:hover:text-secondary"
+                >
+                  Collections
                 </Link>
               </li>
               <li>
@@ -192,15 +184,9 @@ const Footer = () => {
         
         {/* Copyright */}
         <div className="flex flex-col items-center justify-between gap-4 py-8 md:flex-row">
-          <p className="text-gray-600 dark:text-gray-300">
-            © {currentYear} MovieVerse. All rights reserved.
-          </p>
-          <p className="flex items-center text-gray-600 dark:text-gray-300">
-            Made with <FaHeart className="mx-1 text-red-500" /> by MovieVerse Team
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Powered by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-secondary">TMDB</a>
-          </p>
+          <p className="text-gray-600 dark:text-gray-300">© {currentYear} MovieVerse. All rights reserved.</p>
+          <p className="flex items-center text-gray-600 dark:text-gray-300">Made with <FaHeart className="mx-2 text-red-500" /> by Dubicventures</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Powered by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-secondary">TMDB</a></p>
         </div>
       </div>
     </footer>

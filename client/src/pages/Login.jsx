@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaSignInAlt } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
@@ -11,10 +11,6 @@ const Login = () => {
   
   const { login, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get the redirect path from location state or default to home
-  const from = location.state?.from?.pathname || '/';
 
   const validateForm = () => {
     const errors = {};
@@ -43,7 +39,7 @@ const Login = () => {
     const success = await login({ email, password });
     
     if (success) {
-      navigate(from, { replace: true });
+      navigate('/', { replace: true });
     }
   };
 

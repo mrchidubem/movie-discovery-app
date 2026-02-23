@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaStar, FaHeart, FaRegHeart, FaCalendarAlt, FaPlayCircle, FaImage } from 'react-icons/fa';
 import { getImageUrl } from '../services/tmdbApi';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,7 @@ import { showToast } from './ToastContainer';
 
 const MovieCard = ({ movie, isFavorite, onFavoriteToggle }) => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const {
     id,
     title,
@@ -53,9 +54,15 @@ const MovieCard = ({ movie, isFavorite, onFavoriteToggle }) => {
     }
   };
 
+  const handleCardClick = (e) => {
+    // ensure clicks navigate directly to details anchor
+    navigate(`/movie/${id}#watch`);
+  };
+
   return (
-    <Link 
-      to={`/movie/${id}`} 
+    <Link
+      to={`/movie/${id}#watch`}
+      onClick={handleCardClick}
       className="group relative block h-full overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl dark:bg-gray-800"
     >
       {/* Favorite button */}

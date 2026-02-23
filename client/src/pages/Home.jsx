@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTrending } from '../services/tmdbApi';
+import { getTrending, getNowPlaying, getUpcoming, searchMovies } from '../services/tmdbApi';
 import { getFavorites } from '../services/favoriteService';
 import { useAuth } from '../context/AuthContext';
 import TrendingSlider from '../components/TrendingSlider';
@@ -8,24 +8,34 @@ import Loader from '../components/Loader';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [newReleases, setNewReleases] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [suggestedMovies, setSuggestedMovies] = useState([]);
+  const [suggestionSeedTitle, setSuggestionSeedTitle] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isAuthenticated } = useAuth();
 
-  // Fetch trending movies
+  // Fetch trending, new releases, and upcoming movies
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const data = await getTrending(currentPage);
-        setTrendingMovies(data.results);
-        setTotalPages(data.total_pages > 500 ? 500 : data.total_pages); // TMDB API limits to 500 pages
+        const [trendingData, nowPlayingData, upcomingData] = await Promise.all([
+          getTrending(currentPage),
+          getNowPlaying(1, true), // cache-bust for fresh data
+          getUpcoming(1, true),   // cache-bust for fresh data
+        ]);
+        setTrendingMovies(trendingData.results);
+        setNewReleases(nowPlayingData.results || []);
+        setUpcomingMovies(upcomingData.results || []);
+        setTotalPages(trendingData.total_pages > 500 ? 500 : trendingData.total_pages);
       } catch (error) {
-        console.error('Error fetching trending movies:', error);
-        setError('Failed to load trending movies');
+        console.error('Error fetching movies:', error);
+        setError('Failed to load movies');
       } finally {
         setLoading(false);
       }
@@ -49,6 +59,36 @@ const Home = () => {
       fetchFavorites();
     }
   }, [isAuthenticated]);
+
+  // Personalized, real-time suggestions based on a random favorite title
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      if (!favorites || favorites.length === 0) {
+        setSuggestedMovies([]);
+        setSuggestionSeedTitle('');
+        return;
+      }
+
+      try {
+        // pick a random favorite as the "seed"
+        const seed = favorites[Math.floor(Math.random() * favorites.length)];
+        const seedTitle = seed.title || '';
+        if (!seedTitle) return;
+
+        const data = await searchMovies(seedTitle, 1);
+        const results = (data?.results || []).filter((m) => m.id !== seed.movieId).slice(0, 15);
+
+        setSuggestionSeedTitle(seedTitle);
+        setSuggestedMovies(results);
+      } catch (e) {
+        console.error('Failed to load suggestions', e);
+        setSuggestedMovies([]);
+        setSuggestionSeedTitle('');
+      }
+    };
+
+    loadSuggestions();
+  }, [favorites]);
 
   // Handle page change
   const handlePageChange = (page) => {
@@ -80,17 +120,54 @@ const Home = () => {
   }
 
   return (
-    <div>
-      {/* Hero Slider */}
-      <section className="mb-12">
-        <TrendingSlider />
-      </section>
+    <div className="min-h-screen px-2 pb-10 pt-20 sm:px-4 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        {/* Hero Slider */}
+        <section className="mb-12">
+          <TrendingSlider />
+        </section>
 
-      {/* Trending Movies Grid */}
-      <section>
-        {loading ? (
-          <Loader size="large" />
-        ) : (
+        {/* New Releases Grid */}
+        {!loading && newReleases.length > 0 && (
+          <section className="mb-12">
+            <MovieGrid
+              movies={newReleases}
+              title="🎬 New Releases (In Theaters Now)"
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          </section>
+        )}
+
+        {/* Upcoming Movies Grid */}
+        {!loading && upcomingMovies.length > 0 && (
+          <section className="mb-12">
+            <MovieGrid
+              movies={upcomingMovies}
+              title="🔜 Upcoming Movies"
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          </section>
+        )}
+
+        {/* Personalized suggestions (live, based on favorites & TMDB search) */}
+        {!loading && suggestedMovies.length > 0 && (
+          <section className="mb-12">
+            <MovieGrid
+              movies={suggestedMovies}
+              title={suggestionSeedTitle ? `Because you liked "${suggestionSeedTitle}"` : 'Recommended For You'}
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          </section>
+        )}
+
+        {/* Trending Movies Grid */}
+        <section>
+          {loading ? (
+            <Loader size="large" />
+          ) : (
           <MovieGrid
             movies={trendingMovies}
             title="Trending Movies"
@@ -102,6 +179,7 @@ const Home = () => {
           />
         )}
       </section>
+      </div>
     </div>
   );
 };

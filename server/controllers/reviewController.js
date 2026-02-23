@@ -69,6 +69,21 @@ const getUserReviews = async (req, res) => {
   }
 };
 
+// @desc    Get reviews by user id (public)
+// @route   GET /api/reviews/user/:userId
+// @access  Public
+const getReviewsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reviews = await Review.find({ user: userId })
+      .populate('user', 'name displayName photoURL')
+      .sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // @desc    Delete review
 // @route   DELETE /api/reviews/:id
 // @access  Private
@@ -96,5 +111,6 @@ module.exports = {
   addReview,
   getMovieReviews,
   getUserReviews,
+  getReviewsByUserId,
   deleteReview
 }; 

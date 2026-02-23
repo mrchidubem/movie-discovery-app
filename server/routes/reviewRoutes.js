@@ -1,5 +1,11 @@
 const express = require('express');
-const { addReview, getMovieReviews, getUserReviews, deleteReview } = require('../controllers/reviewController');
+const {
+  addReview,
+  getMovieReviews,
+  getUserReviews,
+  getReviewsByUserId,
+  deleteReview,
+} = require('../controllers/reviewController');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -12,6 +18,9 @@ router.get('/:movieId', getMovieReviews);
 
 // Get user's reviews - protected
 router.get('/user/me', auth, getUserReviews);
+
+// Get reviews by user id (public profile pages)
+router.get('/user/:userId', getReviewsByUserId);
 
 // Delete a review - protected
 router.delete('/:id', auth, deleteReview);

@@ -30,10 +30,15 @@ const registerUser = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id)
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        },
+        token: generateToken(user._id),
+        message: 'User registered successfully'
       });
     } else {
       res.status(400).json({ error: 'Invalid user data' });
@@ -66,10 +71,15 @@ const loginUser = async (req, res) => {
 
     // Send back user data and token
     res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id)
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      },
+      token: generateToken(user._id),
+      message: 'Logged in successfully'
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -87,7 +97,9 @@ const getUserProfile = async (req, res) => {
       res.json({
         _id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
       });
     } else {
       res.status(404).json({ error: 'User not found' });
@@ -97,8 +109,56 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Update user profile
+// @route   PUT /api/users/:id
+// @access  Private
+const updateUserProfile = async (req, res) => {
+  try {
+    const { displayName, photoURL } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { displayName, photoURL },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// @desc    Upload user photo
+// @route   POST /api/users/upload-photo
+// @access  Private
+const uploadPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Convert the file buffer to a base64 string
+    const photoURL = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+    res.json({ photoURL });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
-  getUserProfile
+  getUserProfile,
+  updateUserProfile,
+  uploadPhoto
 }; 

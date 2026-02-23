@@ -30,7 +30,36 @@ const userSchema = new mongoose.Schema({
         throw new Error('Password cannot contain "password"');
       }
     }
-  }
+  },
+  displayName: {
+    type: String,
+    trim: true
+  },
+  photoURL: {
+    type: String,
+    default: null
+  },
+  followers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }
+  ],
+  following: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }
+  ],
+  bio: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  isPublic: {
+    type: Boolean,
+    default: true,
+  },
 }, {
   timestamps: true
 });
