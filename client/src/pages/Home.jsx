@@ -120,10 +120,10 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen px-2 pb-10 pt-14 sm:pt-20 md:pt-24 lg:px-8">
+    <div className="min-h-screen px-2 pb-10 pt-12 sm:pt-20 md:pt-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Hero Slider */}
-        <section className="mb-8 sm:mb-12">
+        <section className="mb-6 sm:mb-12">
           <TrendingSlider />
         </section>
 
