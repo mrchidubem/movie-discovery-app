@@ -26,8 +26,8 @@ const Home = () => {
         setLoading(true);
         const [trendingData, nowPlayingData, upcomingData] = await Promise.all([
           getTrending(currentPage),
-          getNowPlaying(1, true),
-          getUpcoming(1, true),
+          getNowPlaying(1, true), // cache-bust for fresh data
+          getUpcoming(1, true),   // cache-bust for fresh data
         ]);
         setTrendingMovies(trendingData.results);
         setNewReleases(nowPlayingData.results || []);
@@ -60,7 +60,7 @@ const Home = () => {
     }
   }, [isAuthenticated]);
 
-  // Personalized suggestions based on a random favorite title
+  // Personalized, real-time suggestions based on a random favorite title
   useEffect(() => {
     const loadSuggestions = async () => {
       if (!favorites || favorites.length === 0) {
@@ -70,6 +70,7 @@ const Home = () => {
       }
 
       try {
+        // pick a random favorite as the "seed"
         const seed = favorites[Math.floor(Math.random() * favorites.length)];
         const seedTitle = seed.title || '';
         if (!seedTitle) return;
@@ -89,18 +90,22 @@ const Home = () => {
     loadSuggestions();
   }, [favorites]);
 
+  // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  // Handle favorite toggle
   const handleFavoriteToggle = (movieId) => {
-    setFavorites((prevFavorites) => {
+    setFavorites(prevFavorites => {
       const movieIdStr = movieId.toString();
-      const exists = prevFavorites.some((fav) => fav.movieId === movieIdStr);
-
+      const exists = prevFavorites.some(fav => fav.movieId === movieIdStr);
+      
       if (exists) {
-        return prevFavorites.filter((fav) => fav.movieId !== movieIdStr);
+        // Remove from favorites
+        return prevFavorites.filter(fav => fav.movieId !== movieIdStr);
       } else {
+        // Add to favorites (will be updated on next favorites fetch)
         return prevFavorites;
       }
     });
@@ -115,19 +120,16 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white">
-      {/* Hero Slider – compact on mobile, starts right under navbar */}
-      <section className="relative -mt-16 md:-mt-20 mb-6 md:mb-12 overflow-hidden">
-        <div className="h-[45vh] max-h-[480px] w-full md:h-[65vh] md:max-h-[720px]">
+    <div className="min-h-screen px-2 pb-10 pt-20 sm:px-4 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        {/* Hero Slider */}
+        <section className="mb-12">
           <TrendingSlider />
-        </div>
-      </section>
+        </section>
 
-      {/* Main content container – responsive padding */}
-      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pb-12 md:pb-20">
-        {/* New Releases */}
+        {/* New Releases Grid */}
         {!loading && newReleases.length > 0 && (
-          <section className="mb-8 md:mb-12">
+          <section className="mb-12">
             <MovieGrid
               movies={newReleases}
               title="🎬 New Releases (In Theaters Now)"
@@ -137,9 +139,9 @@ const Home = () => {
           </section>
         )}
 
-        {/* Upcoming */}
+        {/* Upcoming Movies Grid */}
         {!loading && upcomingMovies.length > 0 && (
-          <section className="mb-8 md:mb-12">
+          <section className="mb-12">
             <MovieGrid
               movies={upcomingMovies}
               title="🔜 Upcoming Movies"
@@ -149,9 +151,9 @@ const Home = () => {
           </section>
         )}
 
-        {/* Personalized Suggestions */}
+        {/* Personalized suggestions (live, based on favorites & TMDB search) */}
         {!loading && suggestedMovies.length > 0 && (
-          <section className="mb-8 md:mb-12">
+          <section className="mb-12">
             <MovieGrid
               movies={suggestedMovies}
               title={suggestionSeedTitle ? `Because you liked "${suggestionSeedTitle}"` : 'Recommended For You'}
@@ -161,27 +163,25 @@ const Home = () => {
           </section>
         )}
 
-        {/* Trending Movies */}
-        <section className="pb-6 md:pb-12">
+        {/* Trending Movies Grid */}
+        <section>
           {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader size="large" />
-            </div>
+            <Loader size="large" />
           ) : (
-            <MovieGrid
-              movies={trendingMovies}
-              title="Trending Movies"
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              favorites={favorites}
-              onFavoriteToggle={handleFavoriteToggle}
-            />
-          )}
-        </section>
+          <MovieGrid
+            movies={trendingMovies}
+            title="Trending Movies"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            favorites={favorites}
+            onFavoriteToggle={handleFavoriteToggle}
+          />
+        )}
+      </section>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default Home; 
