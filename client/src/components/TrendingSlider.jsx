@@ -170,14 +170,12 @@ const TrendingSlider = () => {
       {/* Slides */}
       <div ref={sliderRef} className="h-full flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
         {moviesPool.map((movie) => (
-          <div key={movie.id} className="flex-shrink-0 w-full h-full relative">
-            <div
-              className="h-full w-full bg-center bg-cover"
-              style={{
-                // prefer the poster on narrow screens to avoid cropping wide backdrops
-                backgroundImage: `url(${getImageUrl(movie.poster_path || movie.backdrop_path, 'original')})`,
-              }}
-            >
+          <div key={movie.id} className="flex-shrink-0 w-full h-full relative bg-black">
+            <img
+              src={getImageUrl(movie.backdrop_path || movie.poster_path, 'original')}
+              alt={movie.title}
+              className="h-full w-full object-cover"
+            />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
                 <div className="absolute bottom-0 left-0 w-full p-4 pb-12 sm:p-6 sm:pb-16 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
@@ -207,7 +205,6 @@ const TrendingSlider = () => {
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
         ))}
       </div>

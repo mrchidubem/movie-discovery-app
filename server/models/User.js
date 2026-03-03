@@ -60,6 +60,59 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  notificationPreferences: {
+    emailNotifications: {
+      enabled: {
+        type: Boolean,
+        default: true,
+      },
+      streamingAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      newReleases: {
+        type: Boolean,
+        default: true,
+      },
+      recommendations: {
+        type: Boolean,
+        default: false,
+      },
+      weeklyDigest: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    pushNotifications: {
+      enabled: {
+        type: Boolean,
+        default: true,
+      },
+      streamingAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      newReleases: {
+        type: Boolean,
+        default: false,
+      },
+      actorNews: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    inAppNotifications: {
+      enabled: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    frequency: {
+      type: String,
+      enum: ['real-time', 'daily', 'weekly'],
+      default: 'real-time',
+    },
+  },
 }, {
   timestamps: true
 });

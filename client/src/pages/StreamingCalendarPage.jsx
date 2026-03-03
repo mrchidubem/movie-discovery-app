@@ -1,8 +1,13 @@
 import { useState } from 'react';
-import { FaCalendar, FaTv } from 'react-icons/fa';
+import { FaCalendar, FaTv, FaBell } from 'react-icons/fa';
+import api from '../services/api';
+import Toast from '../components/Toast';
 
 const StreamingCalendarPage = () => {
   const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   const platforms = ['Netflix', 'ShowMax', 'Amazon Prime', 'Disney+', 'HBO Max', 'Hulu'];
 
@@ -61,6 +66,28 @@ const StreamingCalendarPage = () => {
   const filteredUpdates = selectedPlatform === 'all'
     ? streamingUpdates
     : streamingUpdates.filter(update => update.platform.toLowerCase() === selectedPlatform.toLowerCase());
+
+  const handleEnableNotifications = async () => {
+    setLoading(true);
+    try {
+      // Send test notification to all channels
+      const response = await api.post('/api/notifications/test-all');
+      
+      setNotificationsEnabled(true);
+      setToast({
+        message: '✅ Notifications enabled! Check your email and notification panel.',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+      setToast({
+        message: '❌ Failed to enable notifications. Please try again.',
+        type: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -148,14 +175,34 @@ const StreamingCalendarPage = () => {
         )}
       </div>
 
+      {/* Notification Prompt */}
       <div className="mt-12 rounded-lg bg-blue-50 p-6 text-center dark:bg-blue-900/20">
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          🔔 Enable notifications to get alerts when your favorite movies arrive on streaming services
-        </p>
-        <button className="rounded-lg bg-secondary px-6 py-2 font-medium text-white hover:bg-secondary/90 transition-colors">
-          Enable Notifications
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <FaBell className="text-secondary text-2xl animate-bounce" />
+          <p className="text-gray-600 dark:text-gray-400">
+            Enable notifications to get alerts when your favorite movies arrive on streaming services
+          </p>
+        </div>
+        <button 
+          onClick={handleEnableNotifications}
+          disabled={loading || notificationsEnabled}
+          className={`rounded-lg px-6 py-2 font-medium text-white transition-all ${
+            notificationsEnabled
+              ? 'bg-green-500 hover:bg-green-600'
+              : 'bg-secondary hover:bg-secondary/90'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {loading ? '⏳ Enabling...' : notificationsEnabled ? '✅ Notifications Enabled' : 'Enable Notifications'}
         </button>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

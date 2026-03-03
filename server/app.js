@@ -24,6 +24,7 @@ const advancedSearchRoutes = require('./routes/advancedSearchRoutes');
 const emailNotificationRoutes = require('./routes/emailNotificationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const pushNotificationRoutes = require('./routes/pushNotificationRoutes');
+const watchlistNotificationRoutes = require('./routes/watchlistNotificationRoutes');
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api/search/advanced', advancedSearchRoutes);
 app.use('/api/emails', emailNotificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/push', pushNotificationRoutes);
+app.use('/api/watchlist-notifications', watchlistNotificationRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
