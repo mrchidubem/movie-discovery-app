@@ -153,7 +153,7 @@ const TrendingSlider = () => {
       {/* Slider navigation buttons */}
       <button
         onClick={prevSlide}
-        className="absolute left-2 sm:left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="hidden sm:flex absolute left-2 sm:left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
         aria-label="Previous"
       >
         <FaChevronLeft size={20} />
@@ -161,7 +161,7 @@ const TrendingSlider = () => {
       
       <button
         onClick={nextSlide}
-        className="absolute right-2 sm:right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="hidden sm:flex absolute right-2 sm:right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
         aria-label="Next"
       >
         <FaChevronRight size={20} />
