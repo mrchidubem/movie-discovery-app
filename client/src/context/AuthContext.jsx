@@ -24,6 +24,34 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Auto-logout after 30 minutes of inactivity
+  useEffect(() => {
+    if (!user) return;
+
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    let timeoutId;
+
+    const resetTimeout = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        localStorage.clear();
+        setUser(null);
+        showToast('Session expired due to inactivity. Please log in again.', 'warning');
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    // Events that reset the inactivity timer
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => window.addEventListener(event, resetTimeout));
+
+    resetTimeout(); // Initialize timer
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimeout));
+    };
+  }, [user]);
+
   const login = useCallback(async ({ email, password }) => {
     try {
       setLoading(true);

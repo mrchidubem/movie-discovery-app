@@ -13,6 +13,8 @@ const TrendingSlider = () => {
   const autoPlayRef = useRef(null);
   const poolRef = useRef(moviesPool);
   const indexRef = useRef(currentIndex);
+  const touchStartX = useRef(null); // for simple swipe support
+  const touchThreshold = 50; // pixels
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -97,6 +99,19 @@ const TrendingSlider = () => {
     }
   };
 
+  // touch handlers for mobile swipe
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (delta > touchThreshold) prevSlide();
+    else if (delta < -touchThreshold) nextSlide();
+    touchStartX.current = null;
+  };
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % Math.max(1, moviesPool.length));
   };
@@ -107,7 +122,7 @@ const TrendingSlider = () => {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center md:h-[70vh]">
+      <div className="flex h-[40vh] items-center justify-center sm:h-[50vh] md:h-[70vh]">
         <Loader size="large" />
       </div>
     );
@@ -130,7 +145,11 @@ const TrendingSlider = () => {
   }
 
   return (
-    <div className="relative h-[35vh] sm:h-[45vh] md:h-[70vh] overflow-hidden">
+    <div
+      className="relative h-[40vh] sm:h-[50vh] md:h-[65vh] overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Slider navigation buttons */}
       <button
         onClick={prevSlide}
@@ -149,20 +168,16 @@ const TrendingSlider = () => {
       </button>
 
       {/* Slides */}
-      <div ref={sliderRef} className="h-full">
-        {moviesPool.map((movie, index) => {
-          const isActive = index === currentIndex;
-          return (
+      <div ref={sliderRef} className="h-full flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+        {moviesPool.map((movie) => (
+          <div key={movie.id} className="flex-shrink-0 w-full h-full relative">
             <div
-              key={movie.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              className="h-full w-full bg-center bg-cover"
+              style={{
+                // prefer the poster on narrow screens to avoid cropping wide backdrops
+                backgroundImage: `url(${getImageUrl(movie.poster_path || movie.backdrop_path, 'original')})`,
+              }}
             >
-              <div
-                className="h-full w-full bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${getImageUrl(movie.backdrop_path || movie.poster_path, 'original')})`,
-                }}
-              >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
                 <div className="absolute bottom-0 left-0 w-full p-4 pb-12 sm:p-6 sm:pb-16 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
@@ -194,8 +209,7 @@ const TrendingSlider = () => {
                 </div>
               </div>
             </div>
-          );
-        })}
+        ))}
       </div>
 
       {/* Dots indicator */}

@@ -6,10 +6,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-gradient-to-t from-gray-50 to-white pt-12 dark:from-gray-900 dark:to-gray-800">
+    <footer className="bg-gradient-to-t from-gray-50 to-white py-8 md:pt-12 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
         {/* Footer main content */}
-        <div className="grid grid-cols-1 gap-8 pb-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:gap-8 pb-6 md:pb-8 sm:grid-cols-2 md:grid-cols-4">
           {/* About section */}
           <div>
             <div className="mb-4 flex items-center">
@@ -180,13 +180,13 @@ const Footer = () => {
         </div>
         
         {/* Divider */}
-        <div className="my-4 h-px w-full bg-gray-200 dark:bg-gray-700"></div>
+        <div className="my-3 h-px w-full bg-gray-200 dark:bg-gray-700"></div>
         
         {/* Copyright */}
-        <div className="flex flex-col items-center justify-between gap-4 py-8 md:flex-row">
-          <p className="text-gray-600 dark:text-gray-300">© {currentYear} MovieVerse. All rights reserved.</p>
-          <p className="flex items-center text-gray-600 dark:text-gray-300">Made with <FaHeart className="mx-2 text-red-500" /> by Dubicventures</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Powered by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-secondary">TMDB</a></p>
+        <div className="flex flex-col items-center justify-center gap-2 py-4 md:py-6 text-center">
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">© {currentYear} MovieVerse. All rights reserved.</p>
+          <p className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-300">Made with <FaHeart className="mx-1 text-red-500" /> by Dubicventures</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Powered by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">TMDB</a></p>
         </div>
       </div>
     </footer>

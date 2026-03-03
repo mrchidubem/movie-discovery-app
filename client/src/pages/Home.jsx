@@ -125,7 +125,7 @@ const Home = () => {
       </section>
 
       {/* Main content container – responsive padding */}
-      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pb-12 md:pb-20">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8 pb-8 md:pb-20">
         {/* New Releases */}
         {!loading && newReleases.length > 0 && (
           <section className="mb-8 md:mb-12">

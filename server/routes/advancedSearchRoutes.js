@@ -7,7 +7,7 @@ const router = express.Router();
 // Advanced search with filters (year, rating, runtime, language, genre, country)
 router.get('/', auth, async (req, res) => {
   try {
-    const {
+    let {
       q,
       genre,
       genres,
@@ -23,6 +23,15 @@ router.get('/', auth, async (req, res) => {
       sortBy,
       page = 1,
     } = req.query;
+
+    // coerce numeric values
+    page = parseInt(page, 10) || 1;
+    minRating = parseFloat(minRating);
+    maxRating = parseFloat(maxRating);
+    fromYear = parseInt(fromYear, 10);
+    toYear = parseInt(toYear, 10);
+    minRuntime = parseInt(minRuntime, 10);
+    maxRuntime = parseInt(maxRuntime, 10);
 
     const TMDB_API_KEY = process.env.TMDB_API_KEY;
     const TMDB_API_URL = process.env.TMDB_API_URL || 'https://api.themoviedb.org/3';
@@ -53,12 +62,39 @@ router.get('/', auth, async (req, res) => {
       sort_by: sortBy || 'popularity.desc',
     };
 
-    if (minRating) params['vote_average.gte'] = minRating;
-    if (maxRating) params['vote_average.lte'] = maxRating;
-    if (fromYear) params['primary_release_date.gte'] = `${fromYear}-01-01`;
-    if (toYear) params['primary_release_date.lte'] = `${toYear}-12-31`;
-    if (minRuntime) params['with_runtime.gte'] = minRuntime;
-    if (maxRuntime) params['with_runtime.lte'] = maxRuntime;
+    // only add filters when they are valid numbers; also swap ranges if reversed
+    if (!isNaN(minRating) && !isNaN(maxRating)) {
+      const lo = Math.min(minRating, maxRating);
+      const hi = Math.max(minRating, maxRating);
+      params['vote_average.gte'] = lo;
+      params['vote_average.lte'] = hi;
+    } else if (!isNaN(minRating)) {
+      params['vote_average.gte'] = minRating;
+    } else if (!isNaN(maxRating)) {
+      params['vote_average.lte'] = maxRating;
+    }
+
+    if (!isNaN(fromYear) && !isNaN(toYear)) {
+      const lo = Math.min(fromYear, toYear);
+      const hi = Math.max(fromYear, toYear);
+      params['primary_release_date.gte'] = `${lo}-01-01`;
+      params['primary_release_date.lte'] = `${hi}-12-31`;
+    } else if (!isNaN(fromYear)) {
+      params['primary_release_date.gte'] = `${fromYear}-01-01`;
+    } else if (!isNaN(toYear)) {
+      params['primary_release_date.lte'] = `${toYear}-12-31`;
+    }
+
+    if (!isNaN(minRuntime) && !isNaN(maxRuntime)) {
+      const lo = Math.min(minRuntime, maxRuntime);
+      const hi = Math.max(minRuntime, maxRuntime);
+      params['with_runtime.gte'] = lo;
+      params['with_runtime.lte'] = hi;
+    } else if (!isNaN(minRuntime)) {
+      params['with_runtime.gte'] = minRuntime;
+    } else if (!isNaN(maxRuntime)) {
+      params['with_runtime.lte'] = maxRuntime;
+    }
 
     // Accept either `genre` (single) or `genres` (comma separated)
     const genreParam = genre || genres || category;

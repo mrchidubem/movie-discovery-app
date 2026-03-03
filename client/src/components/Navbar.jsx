@@ -103,7 +103,7 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-sm bg-white/80 shadow-md dark:bg-gray-900/75' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-50 shadow-lg bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* Logo */}
@@ -116,26 +116,26 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center space-x-3">
-            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>Home</NavLink>
-            <NavLink to="/search" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>Discover</NavLink>
-            {user && <NavLink to="/favorites" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>❤️ Favorites</NavLink>}
-            {user && <NavLink to="/watchlist" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-800 hover:text-secondary dark:text-gray-200'}`}>⏰ Watchlist</NavLink>}
+            <NavLink to="/" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-950 dark:text-white hover:text-secondary dark:hover:text-secondary'}`}>Home</NavLink>
+            <NavLink to="/search" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-950 dark:text-white hover:text-secondary dark:hover:text-secondary'}`}>Discover</NavLink>
+            {user && <NavLink to="/favorites" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-950 dark:text-white hover:text-secondary dark:hover:text-secondary'}`}>❤️ Favorites</NavLink>}
+            {user && <NavLink to="/watchlist" className={({ isActive }) => `px-3 py-2 rounded-md text-sm font-medium ${isActive ? 'text-secondary' : 'text-gray-950 dark:text-white hover:text-secondary dark:hover:text-secondary'}`}>⏰ Watchlist</NavLink>}
 
             {/* Features Dropdown */}
             <div className="relative" ref={featuresMenuRef}>
               <button
                 onClick={() => setFeaturesMenuOpen(prev => !prev)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-800 hover:text-secondary dark:text-gray-200 flex items-center gap-1"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-950 dark:text-white hover:text-secondary dark:hover:text-secondary flex items-center gap-1"
               >
                 ✨ More <FaChevronDown size={12} className={`transition-transform ${featuresMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {featuresMenuOpen && (
                 <div className="absolute left-0 mt-2 w-56 rounded-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl ring-1 ring-black ring-opacity-5 z-10">
-                  <NavLink to="/search/advanced" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
-                  <NavLink to="/collections" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Curated Collections</NavLink>
-                  <NavLink to="/streaming-calendar" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Streaming Calendar</NavLink>
-                  <NavLink to="/pricing" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm border-t ${isActive ? 'bg-secondary text-white' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}`}>💳 Upgrade Plan</NavLink>
+                  <NavLink to="/search/advanced" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
+                  <NavLink to="/collections" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Curated Collections</NavLink>
+                  <NavLink to="/streaming-calendar" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Streaming Calendar</NavLink>
+                  <NavLink to="/pricing" onClick={() => setFeaturesMenuOpen(false)} className={({ isActive }) => `flex items-center px-4 py-2 text-sm border-t ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}`}>💳 Upgrade Plan</NavLink>
                 </div>
               )}
             </div>
@@ -144,12 +144,12 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
           {/* Right section – visible on all sizes, smaller on mobile */}
           <div className="flex items-center space-x-1.5 sm:space-x-2">
             {/* Search toggle */}
-            <button onClick={() => setSearchVisible(prev => !prev)} className="rounded-full p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button onClick={() => setSearchVisible(prev => !prev)} className="rounded-full p-1.5 sm:p-2 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-950 dark:text-white">
               <FaSearch className="text-lg sm:text-xl" />
             </button>
 
             {/* Dark mode toggle – always visible */}
-            <button onClick={toggleDarkMode} className="rounded-full p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button onClick={toggleDarkMode} className="rounded-full p-1.5 sm:p-2 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-950 dark:text-white">
               {isDarkMode ? <FaSun className="text-lg sm:text-xl" /> : <FaMoon className="text-lg sm:text-xl" />}
             </button>
 
@@ -168,12 +168,12 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
                       <p className="text-sm font-semibold">{user.name || 'User'}</p>
                       <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                     </div>
-                    <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">👤 Profile</Link>
-                    <Link to="/analytics" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">📊 Analytics</Link>
-                    <Link to="/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">❤️ Favorites</Link>
-                    <Link to="/watchlist" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">⏰ Watchlist</Link>
-                    <Link to="/collections" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">📂 Collections</Link>
-                    <Link to="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">⚙️ Settings</Link>
+                    <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">👤 Profile</Link>
+                    <Link to="/analytics" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">📊 Analytics</Link>
+                    <Link to="/favorites" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">❤️ Favorites</Link>
+                    <Link to="/watchlist" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">⏰ Watchlist</Link>
+                    <Link to="/collections" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">📂 Collections</Link>
+                    <Link to="/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">⚙️ Settings</Link>
                     <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">🚪 Sign out</button>
                   </div>
                 )}
@@ -196,7 +196,7 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
             )}
 
             {/* Mobile menu toggle */}
-            <button onClick={() => setMobileOpen(prev => !prev)} className="ml-1 md:hidden rounded-md p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button onClick={() => setMobileOpen(prev => !prev)} className="ml-1 md:hidden rounded-md p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-950 dark:text-white">
               {mobileOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
             </button>
           </div>
@@ -206,15 +206,15 @@ const Navbar = ({ isDarkMode, toggleDarkMode, openAuthModal }) => {
         {mobileOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-3">
             <div className="px-4 space-y-2">
-              <NavLink to="/" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Home</NavLink>
-              <NavLink to="/search" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Discover</NavLink>
-              {user && <NavLink to="/favorites" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>❤️ Favorites</NavLink>}
-              {user && <NavLink to="/watchlist" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>⏰ Watchlist</NavLink>}
+              <NavLink to="/" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Home</NavLink>
+              <NavLink to="/search" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>Discover</NavLink>
+              {user && <NavLink to="/favorites" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>❤️ Favorites</NavLink>}
+              {user && <NavLink to="/watchlist" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>⏰ Watchlist</NavLink>}
               <hr className="my-2 dark:border-gray-700" />
-              <NavLink to="/search/advanced" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
-              <NavLink to="/collections" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Collections</NavLink>
-              <NavLink to="/streaming-calendar" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Calendar</NavLink>
-              <NavLink to="/pricing" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>💳 Upgrade</NavLink>
+              <NavLink to="/search/advanced" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>🔍 Advanced Search</NavLink>
+              <NavLink to="/collections" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📚 Collections</NavLink>
+              <NavLink to="/streaming-calendar" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>📅 Calendar</NavLink>
+              <NavLink to="/pricing" onClick={() => setMobileOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded-md text-base font-medium ${isActive ? 'bg-secondary text-white' : 'text-gray-950 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>💳 Upgrade</NavLink>
             </div>
           </div>
         )}

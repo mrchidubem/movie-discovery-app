@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import BackToTop from './components/BackToTop';
 import ToastContainer from './components/ToastContainer';
 import AuthModal from './components/AuthModal';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -140,6 +141,7 @@ function AppContent() {
       </main>
 
       <Footer />
+      <BackToTop />
       <ToastContainer />
 
       {/* Auth Modal */}

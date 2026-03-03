@@ -9,6 +9,7 @@ import { getGenres } from '../services/tmdbApi';
 
 const AdvancedFilterPage = () => {
   const [filters, setFilters] = useState({
+    q: '',
     minRating: 0,
     maxRating: 10,
     fromYear: 1900,
@@ -29,6 +30,12 @@ const AdvancedFilterPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleFilterChange = (name, value) => {
+    // ensure numeric fields stay numbers
+    const numericFields = ['minRating','maxRating','fromYear','toYear','minRuntime','maxRuntime'];
+    if (numericFields.includes(name)) {
+      value = Number(value);
+      if (isNaN(value)) value = '';
+    }
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
@@ -56,20 +63,28 @@ const AdvancedFilterPage = () => {
     (async (pageToLoad = 1) => {
       try {
         setErrorMessage('');
+        // enforce min<=max on client side
+        const minRat = Number(filters.minRating);
+        const maxRat = Number(filters.maxRating);
+        const minRun = Number(filters.minRuntime);
+        const maxRun = Number(filters.maxRuntime);
+        const fromY = Number(filters.fromYear);
+        const toY = Number(filters.toYear);
+
         const params = {
           page: pageToLoad,
-          minRating: filters.minRating || undefined,
-          maxRating: filters.maxRating || undefined,
-          fromYear: filters.fromYear || undefined,
-          toYear: filters.toYear || undefined,
-          minRuntime: filters.minRuntime || undefined,
-          maxRuntime: filters.maxRuntime || undefined,
-          language: filters.language || undefined,
-          sortBy: filters.sortBy || undefined,
+          q: filters.q || undefined,
+          minRating: minRat <= maxRat ? minRat : maxRat,
+          maxRating: maxRat >= minRat ? maxRat : minRat,
+          fromYear: fromY <= toY ? fromY : toY,
+          toYear: toY >= fromY ? toY : fromY,
+          minRuntime: minRun <= maxRun ? minRun : maxRun,
+          maxRuntime: maxRun >= minRun ? maxRun : minRun,
         };
-
         if (filters.country) params.country = filters.country;
         if (filters.category) params.category = filters.category;
+        // for debugging ensure backend receives what user expects
+        console.debug('Advanced search params', params);
 
         const response = await api.get('/api/search/advanced', { params });
         const data = response.data || {};
@@ -89,16 +104,21 @@ const AdvancedFilterPage = () => {
     if (!isAuthenticated) return;
     setLoading(true);
     try {
+      const minRat = Number(filters.minRating);
+      const maxRat = Number(filters.maxRating);
+      const minRun = Number(filters.minRuntime);
+      const maxRun = Number(filters.maxRuntime);
+      const fromY = Number(filters.fromYear);
+      const toY = Number(filters.toYear);
       const params = {
         page: newPage,
-        minRating: filters.minRating || undefined,
-        maxRating: filters.maxRating || undefined,
-        fromYear: filters.fromYear || undefined,
-        toYear: filters.toYear || undefined,
-        minRuntime: filters.minRuntime || undefined,
-        maxRuntime: filters.maxRuntime || undefined,
-        language: filters.language || undefined,
-        sortBy: filters.sortBy || undefined,
+        q: filters.q || undefined,
+        minRating: minRat <= maxRat ? minRat : maxRat,
+        maxRating: maxRat >= minRat ? maxRat : minRat,
+        fromYear: fromY <= toY ? fromY : toY,
+        toYear: toY >= fromY ? toY : fromY,
+        minRuntime: minRun <= maxRun ? minRun : maxRun,
+        maxRuntime: maxRun >= minRun ? maxRun : minRun,
       };
       if (filters.country) params.country = filters.country;
       if (filters.category) params.category = filters.category;
@@ -126,6 +146,17 @@ const AdvancedFilterPage = () => {
           <h2 className="mb-4 flex items-center text-xl font-bold">
             <FaFilter className="mr-2" /> Filters
           </h2>
+          {/* simple text query */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold">Search term</label>
+            <input
+              type="text"
+              value={filters.q}
+              onChange={(e) => handleFilterChange('q', e.target.value)}
+              placeholder="Title or keywords"
+              className="w-full rounded border px-2 py-1 dark:bg-gray-700"
+            />
+          </div>
 
           <div className="space-y-4">
             {/* Country selector */}
