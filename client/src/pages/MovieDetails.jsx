@@ -308,10 +308,10 @@ const MovieDetails = () => {
       : null;
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       {/* Movie backdrop */}
       {backdropUrl && (
-        <div className="relative mb-8 h-[40vh] w-full overflow-hidden md:h-[60vh]">
+        <div className="relative mb-8 w-full h-[40vh] md:h-[60vh] overflow-hidden">
           <div 
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${backdropUrl})` }}
@@ -320,20 +320,21 @@ const MovieDetails = () => {
           
           {/* Movie info overlay */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="container grid gap-6 px-4 text-white md:grid-cols-3">
+            {/* use flex-col on small screens so poster appears above details */}
+            <div className="container flex flex-col gap-6 px-4 text-white md:grid md:grid-cols-3">
               {/* Poster */}
-              <div className="hidden md:block">
+              <div className="mb-4 md:mb-0 md:block">
                 <ImageWithFallback
                   src={poster_path ? getImageUrl(poster_path) : null}
                   alt={`${title} poster`}
-                  className="mx-auto h-auto max-w-full rounded-lg shadow-lg"
+                  className="mx-auto h-auto max-w-[160px] rounded-lg shadow-lg md:max-w-full"
                 />
               </div>
               
               {/* Details */}
               <div className="md:col-span-2">
-                <h1 className="text-3xl font-bold md:text-4xl">
-                  {title} <span className="text-xl opacity-75">({releaseYear})</span>
+                <h1 className="text-2xl font-bold sm:text-3xl md:text-4xl">
+                  {title} <span className="text-lg sm:text-xl opacity-75">({releaseYear})</span>
                 </h1>
                 
                 <div className="mt-4 flex flex-wrap gap-3">
@@ -381,15 +382,15 @@ const MovieDetails = () => {
                   </div>
                 )}
                 
-                <p className="mt-4 text-lg">{overview}</p>
+                <p className="mt-4 text-base sm:text-lg">{overview}</p>
                 
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
                   {trailer && (
                     <a
                       href={`https://www.youtube.com/watch?v=${trailer.key}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center rounded-md bg-red-600 px-4 py-2 font-medium hover:bg-red-700"
+                      className="flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium hover:bg-red-700"
                     >
                       <FaPlay className="mr-2" />
                       Watch Trailer
@@ -414,7 +415,7 @@ const MovieDetails = () => {
                       href={`https://www.imdb.com/title/${movie.imdb_id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center rounded-md bg-yellow-600 px-4 py-2 font-medium hover:bg-yellow-700"
+                      className="flex items-center rounded-md bg-yellow-600 px-3 py-2 text-sm font-medium hover:bg-yellow-700"
                     >
                       <FaImdb className="mr-2" />
                       IMDb

@@ -118,7 +118,8 @@ const Home = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white">
       {/* Hero Slider – compact on mobile, starts right under navbar */}
       <section className="relative -mt-16 md:-mt-20 mb-6 md:mb-12 overflow-hidden">
-        <div className="h-[45vh] max-h-[480px] w-full md:h-[65vh] md:max-h-[720px]">
+        {/* slider component already defines its responsive height */}
+        <div className="w-full">
           <TrendingSlider />
         </div>
       </section>

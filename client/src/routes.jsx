@@ -13,57 +13,66 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "search", element: <SearchPage /> },
-      { path: "movie/:id", element: <MovieDetails /> },
-      {
-        path: "favorites",
-        element: (
-          <ProtectedRoute>
-            <Favorites />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "watchlist",
-        element: (
-          <ProtectedRoute>
-            <Watchlist />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "collections",
-        element: (
-          <ProtectedRoute>
-            <Collections />
-          </ProtectedRoute>
-        ),
-      },
-      { path: "user/:userId", element: <UserProfile /> },
-      { path: "login", element: <Login /> },
-      { path: "signup", element: <SignUp /> },
-      {
-        path: "profile",
-        element: (
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "search", element: <SearchPage /> },
+        { path: "movie/:id", element: <MovieDetails /> },
+        {
+          path: "favorites",
+          element: (
+            <ProtectedRoute>
+              <Favorites />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "watchlist",
+          element: (
+            <ProtectedRoute>
+              <Watchlist />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "collections",
+          element: (
+            <ProtectedRoute>
+              <Collections />
+            </ProtectedRoute>
+          ),
+        },
+        { path: "user/:userId", element: <UserProfile /> },
+        { path: "login", element: <Login /> },
+        { path: "signup", element: <SignUp /> },
+        {
+          path: "profile",
+          element: (
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          ),
+        },
+      ],
+    },
 
-  // ✅ Proper 404 handling
+    // ✅ Proper 404 handling
+    {
+      path: "*",
+      element: <NotFound />,
+    },
+  ],
   {
-    path: "*",
-    element: <NotFound />,
-  },
-]);
+    // opt into upcoming v7 behaviours early and silence warnings
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
+);
 
 export default router;

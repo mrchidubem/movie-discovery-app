@@ -130,22 +130,22 @@ const TrendingSlider = () => {
   }
 
   return (
-    <div className="relative h-[50vh] overflow-hidden md:h-[70vh]">
+    <div className="relative h-[35vh] sm:h-[45vh] md:h-[70vh] overflow-hidden">
       {/* Slider navigation buttons */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="absolute left-2 sm:left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
         aria-label="Previous"
       >
-        <FaChevronLeft size={24} />
+        <FaChevronLeft size={20} />
       </button>
       
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
+        className="absolute right-2 sm:right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 sm:p-3 text-white opacity-70 transition-all hover:bg-black/50 hover:opacity-100"
         aria-label="Next"
       >
-        <FaChevronRight size={24} />
+        <FaChevronRight size={20} />
       </button>
 
       {/* Slides */}
@@ -165,7 +165,7 @@ const TrendingSlider = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 pb-16 sm:pb-20 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
+                <div className="absolute bottom-0 left-0 w-full p-4 pb-12 sm:p-6 sm:pb-16 md:bottom-10 md:p-10 md:pb-20 lg:w-2/3 lg:pb-24">
                   <div className="animate-fadeSlideUp">
                     <div className="mb-2 flex items-center gap-3">
                       <span className="rounded-full bg-secondary px-2 py-1 text-xs font-medium text-white">Trending</span>
@@ -175,14 +175,14 @@ const TrendingSlider = () => {
                       </div>
                     </div>
 
-                    <h2 className="mb-2 text-3xl font-bold text-white md:text-4xl lg:text-5xl">{movie.title}</h2>
+                    <h2 className="mb-2 text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">{movie.title}</h2>
 
-                    <p className="mb-4 text-sm text-gray-300 line-clamp-2 md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
+                    <p className="mb-4 text-xs text-gray-300 line-clamp-2 sm:text-sm md:text-base md:line-clamp-3 lg:w-3/4">{movie.overview}</p>
 
                     <div className="mt-4 flex flex-wrap gap-3">
-                      <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-6 py-2 font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
+                      <Link to={`/movie/${movie.id}#watch`} className="flex items-center rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-white transition-transform hover:scale-105 hover:bg-opacity-90">
                         <FaInfo className="mr-2" />
-                        View Details
+                        <span className="truncate">View Details</span>
                       </Link>
 
                       <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}`} target="_blank" rel="noopener noreferrer" className="flex items-center rounded-full bg-white/20 px-6 py-2 font-semibold text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/30">
